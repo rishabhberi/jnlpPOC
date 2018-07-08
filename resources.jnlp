@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.6+" codebase="http://localhost:8080/TextToSpeech" href="resources.jnlp">
+    <information>
+        <title>Text to Speech - Resources</title>
+        <vendor>Sabre</vendor>
+        <description>Resources for Text To Speech</description>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.8+" href="http://java.sun.com/products/autodl/j2se"/>
+        <jar href="lib/freetts.jar" download="lazy"/>
+        <jar href="lib/cmu_time_awb.jar" download="lazy"/>
+        <jar href="lib/cmu_us_kal.jar" download="lazy"/>
+        <jar href="lib/cmulex.jar" download="lazy"/>
+        <jar href="lib/cmutimelex.jar" download="lazy"/>
+        <jar href="lib/en_us.jar" download="lazy"/>
+    </resources>
+    <component-desc/>
+    <update check="background"/>
+</jnlp>

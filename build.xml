@@ -1,0 +1,78 @@
+<project name="TextToSpeech" default="jar" basedir=".">	
+	<description>
+		Java App to Convert Text to Speech
+	</description>
+
+	<antversion property="antversion" atleast="1.8"/>
+
+	<property name="src" location="src"/>
+	<property name="build" location="build"/>
+
+	<target name="init">
+		<tstamp/>
+		<mkdir dir="${build}"/>
+	</target>
+
+	<target name="compile" depends="init" description="compile the app">
+		<javac srcdir="${src}" destdir="${build}" includeAntRuntime="false" classpath="lib/freetts.jar;lib/cmu_us_kal.jar;resources.jar"/>
+		<buildnumber/>
+	</target>
+
+	<target name="jar" depends="compile" description="create the jar">
+		<jar destfile="texttospeech.jar">
+			<fileset dir="build"/>
+			<!-- <fileset file="texttospeech.jnlp"/> -->
+			<manifest>
+				<attribute name="Permissions" value="all-permissions"/>
+				<attribute name="Application-Name" value="Text to Speech"/>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Class-Path" value="lib/freetts.jar lib/cmu_us_kal.jar resources.jar"/>
+				<attribute name="Codebase" value="http://localhost:8080/TextToSpeech"/>
+				<attribute name="Main-Class" value="texttospeech.MainPopup"/>
+				<attribute name="Implementation-Vendor" value="Sabre"/>
+				<attribute name="Implementation-Title" value="Text to Speech"/>
+				<attribute name="Implementation-Version" value="${build.number}.0"/>
+				<!-- <attribute name="Application-Library-Allowable-Codebase" value="*"/> -->
+				<!-- <attribute name="Trusted-Library" value="true"/> -->
+			</manifest>
+		</jar>
+		<antcall target="signjar"/>
+	</target>
+
+	<target name="resource-jar" description="create the resources jar">
+		<jar destfile="resources.jar">
+			<fileset dir="resources"/>
+		</jar>
+		<signjar jar="resources.jar" destDir="." alias="tts" storepass="abcd1234" keystore="keystore.jks" preservelastmodified="true" verbose="true" tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp" tsaproxyhost="www-ad-proxy.sabre.com" tsaproxyport="80"/>
+	</target>
+
+	<target name="keystore" description="create keystore">
+		<genkey alias="tts" storepass="abcd1234" dname="CN=SabreSonic Interact, OU=Bangalore, O=Sabre, C=IN" keystore="keystore.jks" validity="730" keysize="2048" storetype="pkcs12"/>
+	</target>
+
+	<target name="signjar" description="sign the jar">
+		<signjar jar="texttospeech.jar" destDir="." alias="tts" storepass="abcd1234" keystore="keystore.jks" preservelastmodified="true" verbose="true" tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp" tsaproxyhost="www-ad-proxy.sabre.com" tsaproxyport="80"/>
+	</target>
+
+	<target name="signjar-other" description="Sign 3rd party JARs">
+		<signjar destDir="lib" alias="tts" storepass="abcd1234" keystore="keystore.jks" preservelastmodified="true" verbose="true" tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp" tsaproxyhost="www-ad-proxy.sabre.com" tsaproxyport="80">
+			<path>
+				<fileset dir="lib" includes="**/*.jar"/>
+			</path>
+		</signjar>		
+	</target>
+
+	<target name="gencert">
+		<exec executable="keytool">
+			<arg line="-export -alias tts -keystore keystore.jks -storepass abcd1234 -rfc -file texttospeech.cer"/>
+		</exec>
+	</target>
+
+	<target name="clean-all" description="clean all files">
+		<delete dir="build"/>
+		<delete file="texttospeech.jar"/>
+		<delete file="texttospeech.cer"/>
+		<delete file="build.number"/>
+		<delete file="keystore.jks"/>
+	</target>
+</project>
